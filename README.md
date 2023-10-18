@@ -1,6 +1,5 @@
-# <p align="center"> AndroidGuide </p>
-
-<p align="center">Android Developer Advanced Study Notes</p>
+# <p align="center">AndroidGuide</p>
+## <p align="center">Android Developer Advanced Study Notes</p>
 
 > [AndroidGuide](https://github.com/leavesCZY/AndroidGuide)의 한글 번역본입니다.
 
