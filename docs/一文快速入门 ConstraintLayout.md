@@ -1126,16 +1126,16 @@ ImageFilterView 是放在 ConstraintLayout 的 `utils.widget`包下的一个 Vie
 
 ImageFilterView 直接继承于 AppCompatImageView，在其基础上扩展了很多用于实现图形变换的功能
 
-| 属性         | 含义                                                         |
-| ------------ | ------------------------------------------------------------ |
+| 属性         | 含义                                                                 |
+| ------------ | -------------------------------------------------------------------- |
 | altSrc       | 用于指定要从 src 变换成的目标图片，可以依靠 crossfade 来实现淡入淡出 |
-| crossfade    | 设置 src 和 altSrc 两张图片之间的混合程度。0=src 1=altSrc图像 |
-| saturation   | 饱和度。0=灰度，1=原始，2=过饱和                             |
-| brightness   | 亮度。0=黑色，1=原始，2=两倍亮度                             |
-| warmth       | 色温。1=自然，2=暖色，0.5=冷色                               |
-| contrast     | 对比度。1=不变，0=灰色，2=高对比度                           |
-| round        | 用于实现圆角，以 dimension 为值                              |
-| roundPercent | 用于实现圆角，取值在 0f-1f 之间，为 1f 时将形成一张圆形图片  |
+| crossfade    | 设置 src 和 altSrc 两张图片之间的混合程度。0=src 1=altSrc图像        |
+| saturation   | 饱和度。0=灰度，1=原始，2=过饱和                                     |
+| brightness   | 亮度。0=黑色，1=原始，2=两倍亮度                                     |
+| warmth       | 色温。1=自然，2=暖色，0.5=冷色                                       |
+| contrast     | 对比度。1=不变，0=灰色，2=高对比度                                   |
+| round        | 用于实现圆角，以 dimension 为值                                      |
+| roundPercent | 用于实现圆角，取值在 0f-1f 之间，为 1f 时将形成一张圆形图片          |
 
 看个例子。在 xml 中声明多个 ImageFilterView
 
