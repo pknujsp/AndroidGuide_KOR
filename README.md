@@ -1,21 +1,8 @@
 # <p align="center"> AndroidGuide </p>
 
-<p align="center">Android Developer 进阶学习笔记，希望对你有所帮助 😃😃😃</p>
+<p align="center">Android Developer Advanced Study Notes</p>
 
-<p align="center">欢迎关注公众号，第一时间看最新文章</p>
-
-# <p align="center"><a href=https://github.com/leavesCZY/AndroidGuide/assets/30774063/47451bed-95f6-40bd-813e-11abba638722>字节数组</a></p>
-
-<div align=center><img src ="https://github.com/leavesCZY/AndroidGuide/assets/30774063/47451bed-95f6-40bd-813e-11abba638722"/></div>
-
-<p align="center"></p>
-
-<p align="center">原创不易，欢迎打赏 😆😆😆</p>
-
-<p align="center"></p>
-
-<div align=center><img src ="https://github.com/leavesCZY/AndroidGuide/assets/30774063/46981435-9ae0-4f7b-8063-f9dd33c67f5b"/></div>
-
+> [AndroidGuide](https://github.com/leavesCZY/AndroidGuide)의 한글 번역본입니다.
 
 - Android
   - [App 出海实践：Google Play 结算系统](https://juejin.cn/post/7271991667245744165)
@@ -99,9 +86,9 @@
   - [Jetpack LiveData 的设计理念及改进](https://juejin.cn/post/6903096576734920717)
   - [从源码看 Jetpack（一）- Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
   - [从源码看 Jetpack（二）- Lifecycle 衍生物源码详解](https://juejin.cn/post/6847902220760203277)
-  - [从源码看 Jetpack（三）- LiveData 源码详解](https://juejin.cn/post/6847902222345633806)
+  - [从源码看 Jetpack（三）- LiveData 源码详解](https://juejin.cn/post/6847902222345633806) - 번역 중
   - [从源码看 Jetpack（四）- LiveData 衍生物源码详解](https://juejin.cn/post/6847902222353858567)
-  - [从源码看 Jetpack（五）- Startup 源码详解](https://juejin.cn/post/6847902224069165070)
+  - [Startup](https://github.com/pknujsp/AndroidGuide_KOR/blob/kor/Jetpack%EF%BC%885%EF%BC%89Startup.md)
   - [从源码看 Jetpack（六）- ViewModel 源码详解](https://juejin.cn/post/6873356946896846856)
   - [从源码看 Jetpack（七）- SavedStateHandle 源码详解](https://juejin.cn/post/6874136956347875342)
 

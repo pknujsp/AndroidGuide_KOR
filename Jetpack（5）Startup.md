@@ -1,41 +1,41 @@
-> 公众号：[字节数组](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/adbc507fc3704fd8955aae739a433db2~tplv-k3u1fbpfcp-zoom-1.image)
->
-> 希望对你有所帮助 🤣🤣
+# Jetpack (5) Startup
 
-> Google Jetpack 自从推出以后，极大地改变了 Android 开发者们的开发模式，并降低了开发难度。这也要求我们对当中一些子组件的实现原理具有一定的了解，所以我就打算来写一系列 Jetpack 源码解析的文章，希望对你有所帮助 🤣🤣🤣
+> [app-startup](https://developer.android.com/topic/libraries/app-startup)은 애플리케이션 시작 시 여러 구성 요소를 초기화하는 간단하고 효율적인 방법을 제공하며, 이를 통해 구성 요소 간의 초기화 순서를 명시적으로 설정하고 애플리케이션 시작 시간을 최적화할 수 있습니다.
 
-最近，Google Jetpack 官网上新增了一个名为 [Startup](https://developer.android.com/topic/libraries/app-startup) 的组件。根据官方文档的介绍，Startup 提供了一种直接高效的方式用来在应用程序启动时对多个组件进行初始化，开发者可以依靠它来显式地设置多个组件间的初始化顺序并优化应用的启动时间
-
-本文内容基于以下版本来进行讲解
-
-```java
-implementation "androidx.startup:startup-runtime:1.0.0-alpha01"
+```kts
+implementation("androidx.startup:startup-runtime:1.1.1")
 ```
 
-# 一、Startup 的意义
+## 필요성
 
-Startup 允许 Library 开发者和 App 开发者共享同一个 ContentProvider 来完成各自的初始化逻辑，并支持设置组件之间的初始化先后顺序，避免为每个需要初始化的组件都单独定义一个 ContentProvider，从而大大缩短应用的启动时间
+`Startup`은 라이브러리 개발자와 앱 개발자가 동일한 `ContentProvider`를 공유하여 각각의 초기화 로직을 완료할 수 있도록 하며, 컴포넌트 간 초기화 시퀀스 설정을 지원하므로 초기화해야 하는 각 컴포넌트에 대해 별도의 `ContentProvider`를 정의할 필요가 없어 애플리케이션 시작 시간을 크게 단축할 수 있습니다.
 
-目前很多第三方依赖库为了简化使用者的使用成本，就选择通过声明一个 ContentProvider 来获取 Context 对象并自动完成初始化过程。例如 Lifecycle 组件就声明了一个 `ProcessLifecycleOwnerInitializer` 用于获取 context 对象并完成初始化。而在 AndroidManifest 文件中声明的每一个 ContentProvider，在 Application 的 `onCreate()` 方法被调用之前就会预先被执行并调用内部的 `onCreate()` 方法。应用每构建并执行一个 ContentProvider 都是有着内存和时间的消耗成本，如果应用的 ContentProvider 过多，无疑会大大增加应用的启动时间
+많은 외부 라이브러리에서는 개발자의 편의성을 위하여 `context` 객체를 가져오고 초기화 프로세스를 자동으로 완료하기 위해 `ContentProvider`를 선언하도록 선택합니다. 예를 들어, `Lifecycle 컴포넌트`는 `context` 객체를 가져오고 초기화 프로세스를 완료하기 위해 `ProcessLifecycleOwnerInitializer`를 선언합니다. 안드로이드 매니페스트 파일에 선언된 각 `ContentProvider`는 애플리케이션의 `onCreate()`가 호출되기 전에 미리 실행됩니다. 이때 애플리케이션에 `ContentProvider`가 너무 많으면 애플리케이션 시작 시간이 크게 늘어납니다.
 
-因此，Startup 的存在无疑是可以为很多依赖项（应用自身的组件和第三方组件）提供一个统一的初始化入口，当然这也需要等到 Startup 发布 release 版本并被大多数三方依赖组件采用之后了
+`Startup`은 많은 의존성(애플리케이션 자체 구성요소, 외부 구성요소)에 대해 하나로 통합된 초기화 진입점을 제공할 수 있지만, 물론 대부분의 타사 종속 컴포넌트에서 `Startup`이 릴리스되고 채택될 때까지 기다려야 합니다.
 
-# 二、如何使用
+## 사용 방법
 
-假设我们的项目中一共有三个 Library 需要进行初始化。当中，Library A 依赖于 Library B，Library B 依赖于 Library C，Library C 不需要其它依赖项，则此时可以分别为三个 Library 建立三个 `Initializer` 实现类
+프로젝트에 세 개의 라이브러리가 있고 초기화해야한다고 가정합니다. 여기서 **Library A**는 **Library B**에 의존하고, **Library B**는 **Library C**에 의존하며, **Library C**는 의존성이 없습니다. 이 경우 세 개의 `Initializer` 구현 클래스를 각각 생성할 수 있습니다.
 
-Initializer 是 Startup 提供的用于声明初始化逻辑和初始化顺序的接口，在 `create(context: Context)`方法中完成初始化过程并返回结果值，在`dependencies()`中指定初始化此 Initializer 前需要先初始化的其它 Initializer 
+> A -> B -> C
+
+
+- Initializer
+  - 초기화 로직과 초기화 순서를 선언하기 위해 `Startup`에서 제공하는 인터페이스
+  - `create(context: Context)`: 초기화하고 결과를 반환
+  - `dependencies()`: `Initializer`를 초기화하기 전에 초기화해야 할 다른 의존성 목록을 반환
 
 ```kotlin
 class InitializerA : Initializer<A> {
 
-    //在此处完成组件的初始化，并返回初始化结果值
+    // 컴포넌트를 초기화하고 초기화 결과 값을 반환합니다.
     override fun create(context: Context): A {
         return A.init(context)
     }
 
-    //获取在初始化自身之前需要先初始化的 Initializer 列表
-    //如果不需要依赖于其它组件，则可以返回一个空列表
+    // 초기화해야 하는 Initializer목록을 가져와서 초기화할 수 있도록 합니다.
+    // 다른 컴포넌트에 의존할 필요가 없다면 빈 리스트를 반환할 수 있습니다.
     override fun dependencies(): List<Class<out Initializer<*>>> {
         return listOf(InitializerB::class.java)
     }
@@ -67,11 +67,15 @@ class InitializerC : Initializer<C> {
 }
 ```
 
-Startup 提供了两种初始化方法，分别是自动初始化和手动初始化（延迟初始化）
+## 초기화 방법
 
-## 自动初始化
+두 가지 초기화 방법이 있으며, **자동 초기화**와 **수동 초기화(지연 초기화)**로 구분됩니다.
 
-在 AndroidManifest 文件中对 Startup 提供的 `InitializationProvider` 进行声明，并且用 meta-data 标签声明 Initializer 实现类的包名路径，value 必须是 `androidx.startup`。在这里我们只需要声明 InitializerA 即可，因为 InitializerB 和 InitializerC 均可以通过 InitializerA 的 `dependencies()`方法的返回值链式定位到
+### 자동 초기화
+
+`AndroidManifest`파일에서 `Startup`에 제공된 `InitializationProvider`를 선언하고,`meta-data` 태그를 사용하여 `Initializer`구현 클래스의 패키지 이름 경로를 선언합니다. value 값은 반드시 `androidx.startup`이어야 합니다. 이번 예제에서는 `InitializerA`만 선언하면 됩니다, `InitializerB`와 `InitializerC`는 `InitializerA`의 `dependencies()`의 반환 값으로 체인 방식으로 지정할 수 있기 때문입니다.
+
+`android:authorities="${applicationId}.androidx-startup"`에서 `${applicationId}`는 변경하지 않아야 합니다.
 
 ```xml
 <provider
@@ -85,29 +89,28 @@ Startup 提供了两种初始化方法，分别是自动初始化和手动初始
 </provider>
 ```
 
-只要完成以上步骤，当应用启动时，Startup 就会自动按照我们规定的顺序依次进行初始化。需要注意的是，如果 Initializer 之间不存在依赖关系，且都希望由 InitializationProvider 为我们自动初始化的话，此时所有的 Initializer 就必须都进行显式声明，且 Initializer 的初始化顺序会和在 provider 中的声明顺序保持一致
+위의 단계를 완료하면 애플리케이션을 시작할 때 `Startup`은 지정한 순서대로 초기화를 자동으로 수행합니다. 주의할 점은, `Initializer`간에 의존성이 없고 모든 `Initializer`가 `InitializationProvider`에 의해 자동으로 초기화되길 원한다면, 모든 `Initializer`는 명시적으로 선언되어야 하며, `Initializer`의 초기화 순서는 `provider` 내의 선언 순서와 일치해야 합니다.
 
-## 手动初始化
+### 수동 초기화
 
-大部分情况下自动初始化的方式都能满足我们的要求，但在某些情况下并不适用，例如：组件的初始化成本（性能消耗或者时间消耗）较高且该组件最终未必会使用到，此时就可以将之改为在使用到的时候再来对其进行初始化了，即懒加载组件
+대부분의 경우 자동 초기화 방식을 사용하면 되나, 어떠한 경우에는 수동 초기화가 더 나을 수도 있습니다. 예를 들어, **컴포넌트의 초기화 비용(성능 소모 또는 시간 소모)**이 높고 해당 컴포넌트가 **사용되지 않을 수 있는 경우**, 컴포넌트가 사용될 때까지 초기화를 지연시킬 수 있습니다.
 
-手动初始化的 Initializer 不需要在 AndroidManifest 中进行声明，只需要通过调用以下方法进行初始化即可
+수동으로 초기화 할 `Initializer`는 `AndroidManifest`파일에 선언할 필요가 없으며, 다음과 같이 초기화 하면 됩니다.
 
 ```kotlin
 val result = AppInitializer.getInstance(this).initializeComponent(InitializerA::class.java)
 ```
 
-由于 Startup 内部会缓存 Initializer 的初始化结果值，所以重复调用 `initializeComponent`方法不会导致多次初始化，该方法也可用于自动初始化时获取初始化结果值
+`Startup` 내부에서는 `Initializer`의 초기화 결과 값을 **캐싱**하기 때문에, `initializeComponent()`를 여러 번 호출하더라도 최초 한번만 초기화됩니다. 이 메소드는 자동 초기화 시 초기화 결과 값을 가져오는 데도 사용할 수 있습니다.
 
-如果应用内的所有 Initializer 都不需要进行自动初始化的话，也可以不在 AndroidManifest 中声明 InitializationProvider 
 
-# 三、注意事项
+### 외부 라이브러리의 자동 초기화를 비활성화 하기
 
-## 移除 Initializer 
+> 자동 초기화를 위해 `Startup`을 사용하는 외부 라이브러리의 `Initializer`를 제거하는 방법입니다.
 
-假设我们在项目中引入的某个第三方依赖库自身使用到了 Startup 进行自动初始化，我们希望将之改为懒加载的方式，但我们无法直接修改第三方依赖库的 AndroidManifest 文件，此时就可以通过 AndroidManifest 的合并规则来移除指定的 Initializer 
+`AndroidManifest`의 병합 규칙을 통해 `Initializer`를 제거할 수 있습니다. (직접 외부 라이브러리의 `AndroidManifest`파일을 수정하는 것은 불가능합니다.)
 
-假设第三方依赖库的 Initializer 的包名路径是 `xxx.xxx.InitializerImpl`，在主项目工程的 AndroidManifest 文件中主动对其进行声明，并添加 `tools:node="remove"` 语句要求在合并 AndroidManifest 文件时移除自身，这样 Startup 就不会自动初始化 InitializerImpl 了
+라이브러리의 `Initializer` 패키지 경로가 `com.example.ExampleLoggerInitializer`이라면, 애플리케이션의 `AndroidManifest`파일에 명시적으로 선언하고 `tools:node="remove"`를 추가하여 `AndroidManifest`파일을 병합할 때 그것을 제거하도록 할 수 있습니다. 이렇게 하면 `Startup`은 지정한 `Initializer`을 자동으로 초기화 하지 않습니다.
 
 ```xml
 <provider
@@ -116,15 +119,16 @@ val result = AppInitializer.getInstance(this).initializeComponent(InitializerA::
     android:exported="false"
     tools:node="merge">
     <meta-data
-        android:name="leavesc.lifecyclecore.mylibrary.TestIn"
+        android:name="com.example.ExampleLoggerInitializer"
         android:value="androidx.startup"
         tools:node="remove" />
 </provider>
 ```
 
-## 禁止自动初始化
+### 모든 자동 초기화를 비활성화 하기
 
-如果希望禁止 Startup 的所有自动初始化逻辑，但又不希望通过直接删除 provider 声明来实现的话，那么可以通过如上所述的方法来实现此目的
+모든 자동 초기화를 비활성화 하려면, `AndroidManifest`파일에 `tools:node="remove"`를 추가하여 모든 `Startup`을 비활성화 할 수 있습니다.
+
 
 ```xml
 <provider
@@ -133,22 +137,22 @@ val result = AppInitializer.getInstance(this).initializeComponent(InitializerA::
     tools:node="remove" />
 ```
 
-## Lint 检查
+## Lint
 
 Startup 包含一组 Lint 规则，可用于检查是否已正确定义了组件的初始化程序，可以通过运行 `./gradlew :app:lintDebug` 来执行检查规则
 
-例如，如果项目中声明的 InitializerB 没有在 AndroidManifest 中进行声明，且也不包含在其它 Initializer 的依赖项列表里时，通过 Lint 检查就可以看到如下的警告语句：
+例如，如果项目中声明的 `InitializerB` 没有在 AndroidManifest 中进行声明，且也不包含在其它 Initializer 的依赖项列表里时，通过 Lint 检查就可以看到如下的警告语句：
 
 ```xml
 Errors found:
 
 xxxx\leavesc\lifecyclecore\core\InitializerHodler.kt:52: Error: Every Initializer needs to be accompanied by a corresponding <meta-data> entry in the AndroidManifest.xml file. [Ensur
 eInitializerMetadata]
-  class InitializerB : Initializer<B> {
+  class `InitializerB` : Initializer<B> {
   ^
 ```
 
-# 四、源码解析
+## 소스코드 분석
 
 Startup 整个依赖库仅包含五个 Java 文件，整体逻辑比较简单，这里依次介绍下每个文件的作用
 
@@ -243,12 +247,12 @@ public interface Initializer<T> {
 
 ## InitializationProvider
 
-InitializationProvider 就是需要我们主动声明在 AndroidManifest 文件中的 ContentProvider，Startup 的整个初始化逻辑都是在这里进行统一触发的
+InitializationProvider 就是需要我们主动声明在 AndroidManifest 文件中的 `ContentProvider`，Startup 的整个初始化逻辑都是在这里进行统一触发的
 
 由于 InitializationProvider 的作用仅是用于统一多个依赖项的初始化入口并获得 Context 对象，所以除了 `onCreate()` 方法会由系统自动调用外，其它方法是没有意义的，如果开发者调用了这几个方法就会直接抛出异常
 
 ```java
-public final class InitializationProvider extends ContentProvider {
+public final class InitializationProvider extends `ContentProvider` {
     @Override
     public boolean onCreate() {
         Context context = getContext();
@@ -489,10 +493,7 @@ void discoverAndInitialize() {
 }
 ```
 
-# 五、不足点
+## 주의사항
 
-Startup 的优点我在上边已经列举了，最后再来列举下它的几个不足点
-
-1. InitializationProvider 的 `onCreate()` 方法是在主线程被调用的，导致我们的每个 Initializer 默认就都是运行在主线程，这对于某些初始化时间过长，需要运行在子线程的组件来说就不太适用了。且 Initializer 的 `create(context: Context)` 方法的本意是完成组件的初始化并返回初始化的结果值，如果在此处通过主动 new Thread 来运行耗时组件的初始化，那么我们就无法返回有意义的结果值，间接导致后续也无法通过 AppInitializer 获取到缓存的初始化结果值
-2. 如果某组件的初始化需要依赖于其它耗时组件（初始化时间过长，需要运行在子线程）的结果值，此时 Startup 一样不适用
-3. 对于已经使用 ContentProvider 完成初始化逻辑的第三方依赖库，我们一般也无法直接修改其初始化逻辑（除非 clone 该项目导到本地直接修改源码），所以在初始阶段 Startup 的意义主要在于统一项目本地组件的初始化入口，需要等到 Startup 被大多数开发者接受并使用后，才更加具有性能优势
+- `InitializationProvider`의 `onCreate()`는 **메인 스레드**에서 호출되며, 각각의 `Initializer`도 따라서 **메인 스레드**에서 실행됩니다. 이는 초기화 시간이 길고, 별도의 스레드에서 실행해야 하는 컴포넌트에는 적합하지 않습니다. 또한 `Initializer`의 `create(context: Context)`의 본래 목적은 컴포넌트를 초기화하고 초기화 결과 값을 반환하는 것입니다. 만약 이 위치에서 **백그라운드 스레드**로 시간이 많이 소요되는 컴포넌트의 초기화를 실행한다면, 유의미한 결과 값을 반환할 수 없게 되며, 이는 간접적으로 `AppInitializer`를 통해 캐시된 초기화 결과 값을 가져올 수 없게 됩니다.
+- 어떤 컴포넌트의 초기화가 다른 시간이 많이 소요되는 컴포넌트(초기화 시간이 길고, 다른 스레드에서 처리)의 결과 값에 의존해야 하는 경우에도, `Startup`은 적합하지 않습니다.
