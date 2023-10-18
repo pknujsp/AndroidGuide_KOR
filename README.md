@@ -85,9 +85,9 @@
   - [Jetpack LiveData 的设计理念及改进](https://juejin.cn/post/6903096576734920717)
   - [从源码看 Jetpack（一）- Lifecycle 源码详解](https://juejin.cn/post/6847902220755992589)
   - [从源码看 Jetpack（二）- Lifecycle 衍生物源码详解](https://juejin.cn/post/6847902220760203277)
-  - [从源码看 Jetpack（三）- LiveData 源码详解](https://juejin.cn/post/6847902222345633806) - 번역 중
+  - [从源码看 Jetpack（三）- LiveData 源码详解](https://juejin.cn/post/6847902222345633806)
   - [从源码看 Jetpack（四）- LiveData 衍生物源码详解](https://juejin.cn/post/6847902222353858567)
-  - [Startup](https://github.com/pknujsp/AndroidGuide_KOR/blob/kor/docs/Jetpack%EF%BC%885%EF%BC%89Startup.md)
+  - [Startup](https://github.com/pknujsp/AndroidGuide_KOR/blob/kor/docs/Jetpack%EF%BC%885%EF%BC%89Startup.md) - 번역 중
   - [从源码看 Jetpack（六）- ViewModel 源码详解](https://juejin.cn/post/6873356946896846856)
   - [从源码看 Jetpack（七）- SavedStateHandle 源码详解](https://juejin.cn/post/6874136956347875342)
 
